@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pistecams</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: smalle bedieningsbalk bovenaan, daaronder een raster van cameratiegels die zich vullen naar schermbreedte. */
+:root{
+  --bg:#eaf0f5; --surface:#ffffff; --ink:#11222e; --muted:#5a6d7b; --line:#ccd7e0;
+  --accent:#c9302a; --accent-ink:#ffffff; --blue:#1c66b0; --media:#0c151c; --media-ink:#dfe8ee;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Barlow","Segoe UI",system-ui,sans-serif;
+  --tile:360px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e171e; --surface:#17242e; --ink:#e6eef3; --muted:#93a6b3; --line:#2b3c48;
+    --accent:#e2524b; --accent-ink:#ffffff; --blue:#6fb2ee; --media:#060b0f; --media-ink:#dfe8ee;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e171e; --surface:#17242e; --ink:#e6eef3; --muted:#93a6b3; --line:#2b3c48;
+  --accent:#e2524b; --accent-ink:#ffffff; --blue:#6fb2ee; --media:#060b0f; --media-ink:#dfe8ee;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 var(--body)}
+.wrap{max-width:1800px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-wrap:wrap;align-items:end;gap:12px 24px;justify-content:space-between}
+h1{font:700 2.6rem/0.95 var(--display);letter-spacing:.01em;text-transform:uppercase;margin:0}
+h1 span{color:var(--accent)}
+.sub{color:var(--muted);margin:4px 0 0}
+.bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.field{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.85rem}
+button,select,input,.btn{font:inherit;color:inherit}
+button,.btn{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:7px 12px;cursor:pointer;font-weight:500}
+button:hover,.btn:hover{border-color:var(--blue)}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+select,input[type=text],input[type=url],input[type=number]{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:7px 9px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border-radius:999px;padding:4px 12px;font-size:.85rem}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,var(--tile)),1fr));gap:14px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.media{position:relative;aspect-ratio:16/9;background:var(--media);color:var(--media-ink);max-width:100%}
+.media img,.media video,.media iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+.media img,.media video{object-fit:cover}
+.media:fullscreen img,.media:fullscreen video{object-fit:contain}
+.fail{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;font-size:.9rem}
+.badge{position:absolute;left:8px;top:8px;background:var(--accent);color:var(--accent-ink);font:700 .75rem var(--display);letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:3px}
+.info{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:9px 10px 9px 12px}
+.txt{min-width:0}
+.name{font:700 1.2rem/1.1 var(--display);letter-spacing:.02em;text-transform:uppercase;overflow-wrap:anywhere}
+.meta{color:var(--muted);font-size:.85rem;font-variant-numeric:tabular-nums}
+.acts{display:flex;gap:4px;flex-shrink:0}
+.acts button,.acts a{padding:4px 7px;font-size:.85rem;line-height:1.2;text-decoration:none}
+.empty{border:1px dashed var(--line);border-radius:8px;padding:32px 16px;text-align:center;color:var(--muted)}
+dialog{border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);padding:20px;width:min(520px,calc(100vw - 32px))}
+dialog::backdrop{background:rgba(6,11,15,.6)}
+dialog h2{font:700 1.6rem/1 var(--display);text-transform:uppercase;margin:0 0 14px}
+form{display:flex;flex-direction:column;gap:12px}
+form label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted)}
+form input,form select{width:100%;color:var(--ink)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hint{font-size:.82rem;color:var(--muted);margin:0}
+.end{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+footer{color:var(--muted);font-size:.82rem;max-width:75ch}
+@media (max-width:480px){h1{font-size:2rem}.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Piste<span>cams</span></h1>
+      <p class="sub" id="count"></p>
+    </div>
+    <div class="bar">
+      <label class="field" for="refresh">Verversen
+        <select id="refresh">
+          <option value="0">uit</option><option value="30">30 sec</option><option value="60">1 min</option><option value="300">5 min</option><option value="900">15 min</option>
+        </select>
+      </label>
+      <label class="field" for="size">Tegelgrootte
+        <input type="range" id="size" min="220" max="720" step="20">
+      </label>
+      <button id="reload" type="button">Ververs nu</button>
+      <button id="export" type="button">Exporteer</button>
+      <button id="importBtn" type="button">Importeer</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+      <button id="add" class="primary" type="button">+ Webcam</button>
+    </div>
+  </header>
+
+  <div class="chips" id="chips"></div>
+  <main class="grid" id="grid"></main>
+  <div class="empty" id="empty" hidden>Nog geen webcams. Klik op <strong>+ Webcam</strong> en plak de link van een camera.</div>
+
+  <footer>
+    Je tegels worden bewaard in deze browser. Gebruik Exporteer om een back-up te maken of ze naar een ander apparaat mee te nemen.
+    Sommige webcamsites staan niet toe dat hun pagina in een andere pagina wordt getoond. De tegel blijft dan leeg. Gebruik in dat geval de directe link naar het camerabeeld (.jpg) of open de camera via de knop ↗.
+  </footer>
+</div>
+
+<dialog id="dlg">
+  <form id="form" method="dialog">
+    <h2 id="dlgTitle">Webcam toevoegen</h2>
+    <label for="fUrl">Link van de webcam
+      <input type="url" id="fUrl" required placeholder="https://...">
+    </label>
+    <div class="row">
+      <label for="fName">Naam
+        <input type="text" id="fName" required placeholder="Bergstation Gaislachkogl">
+      </label>
+      <label for="fArea">Skigebied
+        <input type="text" id="fArea" list="areas" placeholder="Sölden">
+        <datalist id="areas"></datalist>
+      </label>
+    </div>
+    <div class="row">
+      <label for="fAlt">Hoogte in meters (optioneel)
+        <input type="number" id="fAlt" min="0" max="5000" placeholder="3040">
+      </label>
+      <label for="fType">Soort link
+        <select id="fType">
+          <option value="auto">Automatisch herkennen</option>
+          <option value="img">Afbeelding (jpg, png)</option>
+          <option value="frame">Webpagina of speler</option>
+          <option value="video">Videobestand (mp4, webm)</option>
+        </select>
+      </label>
+    </div>
+    <p class="hint">Tip: klik op de webcamsite met rechts op het beeld en kies "Afbeeldingsadres kopiëren". Die link werkt het best.</p>
+    <div class="end">
+      <button type="button" id="cancel">Annuleer</button>
+      <button type="submit" class="primary" id="save">Opslaan</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+(function(){
+  'use strict';
+  var KEY='pistecams.v1';
+  var DEMO='data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360"><rect width="640" height="360" fill="#9cc3e0"/><path d="M0 260 150 110 250 210 380 60 520 220 640 150V360H0z" fill="#f4f8fb"/><path d="M380 60 430 118 400 130 370 105 345 125z" fill="#c9d9e5"/><path d="M0 300 640 250V360H0z" fill="#ffffff"/><text x="320" y="335" font-family="Arial" font-size="20" fill="#11222e" text-anchor="middle">Voorbeeldtegel. Vervang door je eigen webcam.</text></svg>');
+  var state={cams:[{id:'demo',name:'Voorbeeld bergstation',area:'Voorbeeld',alt:2400,url:DEMO,type:'img'}],tile:360,refresh:60,filter:''};
+  var editId=null,timer=null;
+  var $=function(id){return document.getElementById(id);};
+
+  function load(){
+    try{
+      var raw=localStorage.getItem(KEY);
+      if(raw){var s=JSON.parse(raw);if(s&&Array.isArray(s.cams)){state=Object.assign(state,s);}}
+    }catch(e){}
+  }
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+
+  function youtubeId(u){
+    var m=u.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|live\/|embed\/)|youtu\.be\/)([\w-]{6,})/);
+    return m?m[1]:null;
+  }
+  function detect(u){
+    if(/^data:image\//i.test(u))return 'img';
+    var path=u.split('?')[0].split('#')[0];
+    if(/\.(jpe?g|png|gif|webp|avif|bmp)$/i.test(path))return 'img';
+    if(/\.(mp4|webm|ogv)$/i.test(path))return 'video';
+    return 'frame';
+  }
+  function kind(c){return c.type&&c.type!=='auto'?c.type:detect(c.url);}
+  function bust(u){
+    if(/^data:/i.test(u))return u;
+    return u+(u.indexOf('?')>-1?'&':'?')+'_t='+Date.now();
+  }
+  function frameSrc(u){
+    var id=youtubeId(u);
+    return id?'https://www.youtube.com/embed/'+id+'?autoplay=1&mute=1':u;
+  }
+  function el(tag,props,kids){
+    var n=document.createElement(tag),k;
+    for(k in (props||{})){
+      if(k==='text')n.textContent=props[k];
+      else if(k in n&&k!=='list')n[k]=props[k];
+      else n.setAttribute(k,props[k]);
+    }
+    (kids||[]).forEach(function(c){if(c)n.appendChild(c);});
+    return n;
+  }
+
+  function mediaFor(c){
+    var box=el('div',{className:'media'}),k=kind(c),node;
+    if(k==='img'){
+      node=el('img',{alt:'Webcam '+c.name,loading:'lazy',referrerPolicy:'no-referrer'});
+      node.dataset.src=c.url;
+      node.addEventListener('error',function(){
+        if(box.querySelector('.fail'))return;
+        box.appendChild(el('div',{className:'fail',text:'Beeld kan niet worden geladen. Controleer de link of open de camera met ↗.'}));
+      });
+      node.addEventListener('load',function(){var f=box.querySelector('.fail');if(f)f.remove();});
+      node.src=bust(c.url);
+    }else if(k==='video'){
+      node=el('video',{src:c.url,muted:true,autoplay:true,loop:true,controls:true,playsInline:true});
+    }else{
+      node=el('iframe',{src:frameSrc(c.url),title:'Webcam '+c.name,loading:'lazy',allow:'autoplay; fullscreen',allowFullscreen:true});
+      node.dataset.src=frameSrc(c.url);
+    }
+    box.appendChild(node);
+    if(c.id==='demo')box.appendChild(el('span',{className:'badge',text:'Voorbeeld'}));
+    return box;
+  }
+
+  function render(){
+    var grid=$('grid'),chips=$('chips'),areas=[],shown;
+    state.cams.forEach(function(c){if(c.area&&areas.indexOf(c.area)<0)areas.push(c.area);});
+    areas.sort(function(a,b){return a.localeCompare(b,'nl');});
+    if(state.filter&&areas.indexOf(state.filter)<0)state.filter='';
+
+    chips.textContent='';
+    if(areas.length>1){
+      [''].concat(areas).forEach(function(a){
+        var b=el('button',{type:'button',className:'chip',text:a||'Alle gebieden'});
+        b.setAttribute('aria-pressed',String(state.filter===a));
+        b.addEventListener('click',function(){state.filter=a;save();render();});
+        chips.appendChild(b);
+      });
+    }
+    $('areas').textContent='';
+    areas.forEach(function(a){$('areas').appendChild(el('option',{value:a}));});
+
+    shown=state.cams.filter(function(c){return !state.filter||c.area===state.filter;});
+    grid.textContent='';
+    shown.forEach(function(c){
+      var media=mediaFor(c);
+      var meta=[c.area,c.alt?Number(c.alt).toLocaleString('nl-NL')+' m':''].filter(Boolean).join(' · ');
+      var acts=el('div',{className:'acts'},[
+        btn('◀','Naar voren',function(){move(c.id,-1);}),
+        btn('▶','Naar achteren',function(){move(c.id,1);}),
+        btn('⛶','Volledig scherm',function(){if(media.requestFullscreen)media.requestFullscreen().catch(function(){});}),
+        /^data:/i.test(c.url)?null:el('a',{className:'btn',href:c.url,target:'_blank',rel:'noopener',title:'Open de camera in een nieuw tabblad',text:'↗'}),
+        btn('✎','Bewerk',function(){openDialog(c.id);}),
+        btn('✕','Verwijder',function(){remove(c.id,this);})
+      ]);
+      grid.appendChild(el('article',{className:'tile'},[
+        media,
+        el('div',{className:'info'},[
+          el('div',{className:'txt'},[el('div',{className:'name',text:c.name}),el('div',{className:'meta',text:meta||' '})]),
+          acts
+        ])
+      ]));
+    });
+    $('empty').hidden=state.cams.length>0;
+    $('count').textContent=state.cams.length+(state.cams.length===1?' webcam':' webcams')+(areas.length?' in '+areas.length+(areas.length===1?' skigebied':' skigebieden'):'');
+    document.documentElement.style.setProperty('--tile',state.tile+'px');
+    $('size').value=state.tile;$('refresh').value=String(state.refresh);
+  }
+  function btn(label,title,fn){
+    var b=el('button',{type:'button',text:label,title:title});
+    b.setAttribute('aria-label',title);b.addEventListener('click',fn);return b;
+  }
+
+  function move(id,d){
+    var i=state.cams.findIndex(function(c){return c.id===id;}),j=i+d;
+    if(i<0||j<0||j>=state.cams.length)return;
+    var t=state.cams[i];state.cams[i]=state.cams[j];state.cams[j]=t;save();render();
+  }
+  function remove(id,b){
+    if(b.dataset.sure!=='1'){b.dataset.sure='1';b.textContent='Zeker?';setTimeout(function(){b.dataset.sure='';b.textContent='✕';},3000);return;}
+    state.cams=state.cams.filter(function(c){return c.id!==id;});save();render();
+  }
+
+  function openDialog(id){
+    editId=id||null;
+    var c=id?state.cams.find(function(x){return x.id===id;}):null;
+    $('dlgTitle').textContent=c?'Webcam bewerken':'Webcam toevoegen';
+    $('fUrl').value=c&&!/^data:/i.test(c.url)?c.url:'';
+    $('fName').value=c?c.name:'';
+    $('fArea').value=c?c.area||'':(state.filter||'');
+    $('fAlt').value=c&&c.alt?c.alt:'';
+    $('fType').value=c?c.type||'auto':'auto';
+    $('dlg').showModal();$('fUrl').focus();
+  }
+  $('form').addEventListener('submit',function(e){
+    e.preventDefault();
+    var c={id:editId||('c'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)),
+      url:$('fUrl').value.trim(),name:$('fName').value.trim(),area:$('fArea').value.trim(),
+      alt:$('fAlt').value?Number($('fAlt').value):null,type:$('fType').value};
+    if(!/^https?:\/\//i.test(c.url)){$('fUrl').setCustomValidity('Gebruik een link die begint met http:// of https://');$('fUrl').reportValidity();return;}
+    var i=state.cams.findIndex(function(x){return x.id===editId;});
+    if(i>-1)state.cams[i]=c;else{
+      state.cams=state.cams.filter(function(x){return x.id!=='demo';});
+      state.cams.push(c);
+    }
+    save();$('dlg').close();render();
+  });
+  $('fUrl').addEventListener('input',function(){this.setCustomValidity('');});
+  $('cancel').addEventListener('click',function(){$('dlg').close();});
+  $('add').addEventListener('click',function(){openDialog();});
+
+  function refreshAll(frames){
+    document.querySelectorAll('.media img').forEach(function(i){i.src=bust(i.dataset.src);});
+    if(frames)document.querySelectorAll('.media iframe').forEach(function(f){f.src=f.dataset.src;});
+  }
+  function schedule(){
+    clearInterval(timer);timer=null;
+    if(state.refresh>0)timer=setInterval(function(){if(!document.hidden)refreshAll(false);},state.refresh*1000);
+  }
+  $('reload').addEventListener('click',function(){refreshAll(true);});
+  $('refresh').addEventListener('change',function(){state.refresh=Number(this.value);save();schedule();});
+  $('size').addEventListener('input',function(){state.tile=Number(this.value);document.documentElement.style.setProperty('--tile',state.tile+'px');save();});
+
+  $('export').addEventListener('click',function(){
+    var cams=state.cams.filter(function(c){return c.id!=='demo';});
+    var a=el('a',{href:URL.createObjectURL(new Blob([JSON.stringify({cams:cams},null,2)],{type:'application/json'})),download:'pistecams.json'});
+    document.body.appendChild(a);a.click();a.remove();
+  });
+  $('importBtn').addEventListener('click',function(){$('importFile').click();});
+  $('importFile').addEventListener('change',function(){
+    var f=this.files[0];if(!f)return;
+    var r=new FileReader();
+    r.onload=function(){
+      try{
+        var d=JSON.parse(r.result),list=Array.isArray(d)?d:d.cams;
+        if(!Array.isArray(list))throw new Error('x');
+        var have=state.cams.map(function(c){return c.url;});
+        list.forEach(function(c){
+          if(c&&typeof c.url==='string'&&/^https?:\/\//i.test(c.url)&&have.indexOf(c.url)<0){
+            state.cams.push({id:'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),url:c.url,name:String(c.name||'Webcam'),area:String(c.area||''),alt:c.alt?Number(c.alt):null,type:c.type||'auto'});
+            have.push(c.url);
+          }
+        });
+        state.cams=state.cams.length>1?state.cams.filter(function(c){return c.id!=='demo';}):state.cams;
+        save();render();
+      }catch(e){$('count').textContent='Importeren mislukt. Kies een bestand dat met Exporteer is gemaakt.';}
+    };
+    r.readAsText(f);this.value='';
+  });
+
+  load();render();schedule();
+  window.__pistecams={detect:detect,youtubeId:youtubeId,state:function(){return state;}};
+})();
+</script>
+</body>
+</html>
