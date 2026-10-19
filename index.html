@@ -117,7 +117,7 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
   <div class="empty" id="empty" hidden>Nog geen webcams. Klik op <strong>+ Webcam</strong> en plak de link van een camera, of op <strong>Standaard</strong> om de vaste webcams terug te zetten.</div>
 
   <footer>
-    Sneeuwhoogtes komen van <a href="https://www.sneeuwhoogte.nl" target="_blank" rel="noopener">sneeuwhoogte.nl</a> en worden elke drie uur bijgewerkt. Het skigebied van elke vaste webcam wordt automatisch opgezocht. De vaste webcams staan in de pagina zelf. Wijzigingen die je maakt worden bewaard in deze browser. Gebruik Exporteer om een back-up te maken of ze naar een ander apparaat mee te nemen.
+    Sneeuwhoogtes komen van <a href="https://www.sneeuwhoogte.nl" target="_blank" rel="noopener">sneeuwhoogte.nl</a> en worden elke drie uur bijgewerkt. Bij elke webcam wordt het skigebied automatisch opgezocht, ook bij webcams die je zelf toevoegt. De vaste webcams staan in de pagina zelf. Wijzigingen die je maakt worden bewaard in deze browser. Gebruik Exporteer om een back-up te maken of ze naar een ander apparaat mee te nemen.
     Sommige webcamsites staan niet toe dat hun pagina in een andere pagina wordt getoond. De tegel blijft dan leeg. Gebruik in dat geval de directe link naar het camerabeeld (.jpg) of open de camera via de knop ↗.
     <div class="gh" id="gh" hidden>
       <a class="btn" id="ghFolder" href="#" target="_blank" rel="noopener">Bestandsmap op GitHub</a>
@@ -278,12 +278,47 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
     $('size').value=state.tile;$('refresh').value=String(state.refresh);
   }
   var snow=null;
+  function norm(t){
+    t=String(t||'').trim().toLowerCase().normalize('NFC')
+      .replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss');
+    t=t.normalize('NFD').replace(/[̀-ͯ]/g,'');
+    t=t.replace(/ae/g,'a').replace(/oe/g,'o').replace(/ue/g,'u');
+    return t.replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+  }
+  function kleiner(a,b){for(var i=0;i<a.length;i++){if(a[i]!==b[i])return a[i]<b[i];}return false;}
+  function subset(a,b){for(var i=0;i<a.length;i++){if(b.indexOf(a[i])<0)return false;}return true;}
+  function zoekPlaats(naam,plaatsen){
+    var doel=norm(naam);if(!doel)return null;
+    var woorden=doel.split('-'),beste=null,bs=null;
+    plaatsen.forEach(function(p){
+      var dorp=norm(p.naam),gebied=norm(p.skigebied),slug=norm(p.url.split('/').pop()),score;
+      if(doel===dorp||doel===slug)score=1;
+      else if(doel===gebied)score=2;
+      else if(subset(woorden,dorp.split('-').concat(slug.split('-'))))score=3;
+      else if(subset(woorden,gebied.split('-')))score=4;
+      else{
+        var alle=dorp.split('-').concat(slug.split('-'),gebied.split('-'));
+        if(woorden.every(function(w){return w.length>=4&&alle.some(function(x){return x.indexOf(w)===0;});}))score=5;
+        else return;
+      }
+      var k=[score,dorp&&gebied.split('-').indexOf(dorp)>=0?0:1,-(p.berg==null?-1:p.berg),p.naam.length];
+      if(!bs||kleiner(k,bs)){bs=k;beste=p;}
+    });
+    return beste;
+  }
+  function snowData(area){
+    if(!snow||!area)return null;
+    var plaatsen=snow.plaatsen||[],kop=snow.koppelingen||{},url=null,k,p=null;
+    for(k in kop){if(k.toLowerCase()===area.trim().toLowerCase()){url=kop[k];break;}}
+    if(url){p=plaatsen.find(function(x){return x.url===url;})||{naam:area,url:url,berg:null,dal:null};}
+    else p=zoekPlaats(area,plaatsen);
+    if(!p)return null;
+    return Object.assign({},p,(snow.details||{})[p.url]||{});
+  }
   function snowFor(c){
-    if(!snow||!c.area)return null;
-    var key=c.area.trim().toLowerCase(),d=null,k;
-    for(k in snow){if(k.toLowerCase()===key){d=snow[k];break;}}
+    var d=snowData(c.area);
     if(!d)return null;
-    var a=el('a',{className:'snow',href:d.url,target:'_blank',rel:'noopener',title:'Bron: sneeuwhoogte.nl'+(d.laatste_update?' · bijgewerkt '+d.laatste_update:'')});
+    var a=el('a',{className:'snow',href:d.url,target:'_blank',rel:'noopener',title:'Bron: sneeuwhoogte.nl · '+d.naam+(d.laatste_update?' · bijgewerkt '+d.laatste_update:'')});
     function part(lbl,val){a.appendChild(el('span',{},[el('span',{className:'lbl',text:lbl+' '}),el('b',{text:val})]));}
     if(d.berg==null&&d.dal==null){a.appendChild(el('span',{className:'nodata',text:'Nog geen sneeuwhoogte gemeld'}));}
     else{part('Berg',d.berg==null?'.':d.berg+' cm');part('Dal',d.dal==null?'.':d.dal+' cm');}
@@ -294,7 +329,7 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
   function loadSnow(){
     if(location.protocol==='file:')return;
     fetch('sneeuw.json?_='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null;})
-      .then(function(j){if(j&&j.gebieden){snow=j.gebieden;render();}}).catch(function(){});
+      .then(function(j){if(j&&Array.isArray(j.plaatsen)){snow=j;render();}}).catch(function(){});
   }
   function btn(label,title,fn){
     var b=el('button',{type:'button',text:label,title:title});
@@ -394,7 +429,7 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
   if(gh){$('ghFolder').href=gh;$('ghUpload').href=gh+'/upload/main';$('gh').hidden=false;}
 
   load();render();schedule();loadSnow();setInterval(function(){if(!document.hidden)loadSnow();},30*60*1000);
-  window.__pistecams={githubRepo:githubRepo,detect:detect,youtubeId:youtubeId,state:function(){return state;}};
+  window.__pistecams={githubRepo:githubRepo,zoekPlaats:zoekPlaats,norm:norm,detect:detect,youtubeId:youtubeId,state:function(){return state;}};
 })();
 </script>
 </body>
