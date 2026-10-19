@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pistecams</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJjIj48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNjKSI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjMWM2NmIwIi8+PGNpcmNsZSBjeD0iNTAiIGN5PSIxMyIgcj0iNSIgZmlsbD0iI2ZmZDI1YSIvPjxwYXRoIGQ9Ik0tMiA2MCBMMjIgMTggTDM0IDM0IEw0MyAyMyBMNjYgNjAgWiIgZmlsbD0iI2ZmZmZmZiIvPjxwYXRoIGQ9Ik0yMiAxOCBMMjggMjggTDI0IDI2IEwyMCAzMCBMMTcgMjcgWiIgZmlsbD0iI2M5ZDllNSIvPjxwYXRoIGQ9Ik0tMiA2MiBMNjYgNDIgTDY2IDY2IEwtMiA2NiBaIiBmaWxsPSIjZTZlZmY2Ii8+PGcgc3Ryb2tlPSIjYzkzMDJhIiBzdHJva2Utd2lkdGg9IjQuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIj48cGF0aCBkPSJNMzQgMzggTDM5IDQ2IEw0NSA0NyIvPjxwYXRoIGQ9Ik0zOSA0NiBMMzYgNTIiLz48cGF0aCBkPSJNMzQgMzggTDI4IDQyIi8+PHBhdGggZD0iTTM1IDQwIEw0MiAzOSIvPjwvZz48Y2lyY2xlIGN4PSIzMiIgY3k9IjMyLjUiIHI9IjMuOCIgZmlsbD0iI2M5MzAyYSIvPjxwYXRoIGQ9Ik0yNCA1NiBMNTIgNDgiIHN0cm9rZT0iIzExMjIyZSIgc3Ryb2tlLXdpZHRoPSIzLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0yOCA0MiBMMjMgNTQgTTQyIDM5IEw0OCA1MCIgc3Ryb2tlPSIjMTEyMjJlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvZz48L3N2Zz4K">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700&family=Barlow:wght@400;500;600&display=swap">
 <style>
 /* Layout: smalle bedieningsbalk bovenaan, daaronder een raster van cameratiegels die zich vullen naar schermbreedte. */
@@ -31,6 +32,8 @@
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 var(--body)}
 .wrap{max-width:1800px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:flex;flex-direction:column;gap:18px}
 header{display:flex;flex-wrap:wrap;align-items:end;gap:12px 24px;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{width:48px;height:48px;flex-shrink:0}
 h1{font:700 2.6rem/0.95 var(--display);letter-spacing:.01em;text-transform:uppercase;margin:0}
 h1 span{color:var(--accent)}
 .sub{color:var(--muted);margin:4px 0 0}
@@ -69,6 +72,9 @@ form input,form select{width:100%;color:var(--ink)}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .hint{font-size:.82rem;color:var(--muted);margin:0}
 .end{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+.gh{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.gh a{font-size:.8rem;padding:4px 10px;text-decoration:none;color:var(--muted)}
+.gh a:hover{color:var(--ink)}
 footer{color:var(--muted);font-size:.82rem;max-width:75ch}
 @media (max-width:480px){h1{font-size:2rem}.row{grid-template-columns:1fr}}
 </style>
@@ -76,9 +82,12 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
 <body>
 <div class="wrap">
   <header>
-    <div>
+    <div class="brand">
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGNsaXBQYXRoIGlkPSJjIj48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNjKSI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjMWM2NmIwIi8+PGNpcmNsZSBjeD0iNTAiIGN5PSIxMyIgcj0iNSIgZmlsbD0iI2ZmZDI1YSIvPjxwYXRoIGQ9Ik0tMiA2MCBMMjIgMTggTDM0IDM0IEw0MyAyMyBMNjYgNjAgWiIgZmlsbD0iI2ZmZmZmZiIvPjxwYXRoIGQ9Ik0yMiAxOCBMMjggMjggTDI0IDI2IEwyMCAzMCBMMTcgMjcgWiIgZmlsbD0iI2M5ZDllNSIvPjxwYXRoIGQ9Ik0tMiA2MiBMNjYgNDIgTDY2IDY2IEwtMiA2NiBaIiBmaWxsPSIjZTZlZmY2Ii8+PGcgc3Ryb2tlPSIjYzkzMDJhIiBzdHJva2Utd2lkdGg9IjQuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIj48cGF0aCBkPSJNMzQgMzggTDM5IDQ2IEw0NSA0NyIvPjxwYXRoIGQ9Ik0zOSA0NiBMMzYgNTIiLz48cGF0aCBkPSJNMzQgMzggTDI4IDQyIi8+PHBhdGggZD0iTTM1IDQwIEw0MiAzOSIvPjwvZz48Y2lyY2xlIGN4PSIzMiIgY3k9IjMyLjUiIHI9IjMuOCIgZmlsbD0iI2M5MzAyYSIvPjxwYXRoIGQ9Ik0yNCA1NiBMNTIgNDgiIHN0cm9rZT0iIzExMjIyZSIgc3Ryb2tlLXdpZHRoPSIzLjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0yOCA0MiBMMjMgNTQgTTQyIDM5IEw0OCA1MCIgc3Ryb2tlPSIjMTEyMjJlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvZz48L3N2Zz4K" alt="">
+      <div>
       <h1>Piste<span>cams</span></h1>
       <p class="sub" id="count"></p>
+      </div>
     </div>
     <div class="bar">
       <label class="field" for="refresh">Verversen
@@ -92,6 +101,7 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
       <button id="reload" type="button">Ververs nu</button>
       <button id="export" type="button">Exporteer</button>
       <button id="importBtn" type="button">Importeer</button>
+      <button id="reset" type="button" title="Zet de standaard webcams terug">Standaard</button>
       <input type="file" id="importFile" accept="application/json,.json" hidden>
       <button id="add" class="primary" type="button">+ Webcam</button>
     </div>
@@ -99,11 +109,15 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
 
   <div class="chips" id="chips"></div>
   <main class="grid" id="grid"></main>
-  <div class="empty" id="empty" hidden>Nog geen webcams. Klik op <strong>+ Webcam</strong> en plak de link van een camera.</div>
+  <div class="empty" id="empty" hidden>Nog geen webcams. Klik op <strong>+ Webcam</strong> en plak de link van een camera, of op <strong>Standaard</strong> om de vaste webcams terug te zetten.</div>
 
   <footer>
-    Je tegels worden bewaard in deze browser. Gebruik Exporteer om een back-up te maken of ze naar een ander apparaat mee te nemen.
+    De vaste webcams staan in de pagina zelf. Wijzigingen die je maakt worden bewaard in deze browser. Gebruik Exporteer om een back-up te maken of ze naar een ander apparaat mee te nemen.
     Sommige webcamsites staan niet toe dat hun pagina in een andere pagina wordt getoond. De tegel blijft dan leeg. Gebruik in dat geval de directe link naar het camerabeeld (.jpg) of open de camera via de knop ↗.
+    <div class="gh" id="gh" hidden>
+      <a class="btn" id="ghFolder" href="#" target="_blank" rel="noopener">Bestandsmap op GitHub</a>
+      <a class="btn" id="ghUpload" href="#" target="_blank" rel="noopener">Bestanden uploaden</a>
+    </div>
   </footer>
 </div>
 
@@ -147,8 +161,9 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
 (function(){
   'use strict';
   var KEY='pistecams.v1';
-  var DEMO='data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360"><rect width="640" height="360" fill="#9cc3e0"/><path d="M0 260 150 110 250 210 380 60 520 220 640 150V360H0z" fill="#f4f8fb"/><path d="M380 60 430 118 400 130 370 105 345 125z" fill="#c9d9e5"/><path d="M0 300 640 250V360H0z" fill="#ffffff"/><text x="320" y="335" font-family="Arial" font-size="20" fill="#11222e" text-anchor="middle">Voorbeeldtegel. Vervang door je eigen webcam.</text></svg>');
-  var state={cams:[{id:'demo',name:'Voorbeeld bergstation',area:'Voorbeeld',alt:2400,url:DEMO,type:'img'}],tile:360,refresh:60,filter:''};
+  var DEFAULTS=[{"id": "d1", "url": "https://webtvfc.feratel.com/webtv/?design=v5&pg=DA7D2F22-8600-464D-9D4F-CDB04014A6C5&cam=5216&lg=de&sound=muted", "name": "Achterjet bergstation", "area": "Flachau", "alt": 1600, "type": "auto"}, {"id": "d2", "url": "https://webtvfc.feratel.com/webtv/?design=v5&pg=DA7D2F22-8600-464D-9D4F-CDB04014A6C5&cam=5635&lg=nl&sound=muted", "name": "Penkenbaan", "area": "Mayrhofen", "alt": 2000, "type": "auto"}, {"id": "d3", "url": "https://webtvfc.feratel.com/webtv/?design=v5&pg=DA7D2F22-8600-464D-9D4F-CDB04014A6C5&cam=5552&lg=nl&sound=muted", "name": "Gefrorene Wand", "area": "Hintertux", "alt": 3250, "type": "auto"}, {"id": "d4", "url": "https://webtvfc.feratel.com/webtv/?design=v5&pg=DA7D2F22-8600-464D-9D4F-CDB04014A6C5&cam=5226&lg=nl&sound=muted", "name": "Isskogel", "area": "Gerlos", "alt": 1900, "type": "auto"}, {"id": "d5", "url": "https://webtvfc.feratel.com/webtv/?cam=5244&design=v5&c0=0&c2=1&c27=1&c45=1&sound=0&lg=nl&pg=DA7D2F22-8600-464D-9D4F-CDB04014A6C5&s=0", "name": "Kohlmaiskopf", "area": "Saalbach", "alt": 1794, "type": "auto"}, {"id": "d6", "url": "https://webtv.feratel.com/webtv/?design=v3&pg=88803C51-0772-44C5-B2C0-8548D51BB270&cam=5542&lg=nl", "name": "Möseralm", "area": "Fiss", "alt": 1812, "type": "auto"}];
+  function copyDefaults(){return DEFAULTS.map(function(c){return Object.assign({},c);});}
+  var state={cams:copyDefaults(),tile:360,refresh:60,filter:''};
   var editId=null,timer=null;
   var $=function(id){return document.getElementById(id);};
 
@@ -209,7 +224,6 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
       node.dataset.src=frameSrc(c.url);
     }
     box.appendChild(node);
-    if(c.id==='demo')box.appendChild(el('span',{className:'badge',text:'Voorbeeld'}));
     return box;
   }
 
@@ -291,7 +305,6 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
     if(!/^https?:\/\//i.test(c.url)){$('fUrl').setCustomValidity('Gebruik een link die begint met http:// of https://');$('fUrl').reportValidity();return;}
     var i=state.cams.findIndex(function(x){return x.id===editId;});
     if(i>-1)state.cams[i]=c;else{
-      state.cams=state.cams.filter(function(x){return x.id!=='demo';});
       state.cams.push(c);
     }
     save();$('dlg').close();render();
@@ -313,7 +326,7 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
   $('size').addEventListener('input',function(){state.tile=Number(this.value);document.documentElement.style.setProperty('--tile',state.tile+'px');save();});
 
   $('export').addEventListener('click',function(){
-    var cams=state.cams.filter(function(c){return c.id!=='demo';});
+    var cams=state.cams;
     var a=el('a',{href:URL.createObjectURL(new Blob([JSON.stringify({cams:cams},null,2)],{type:'application/json'})),download:'pistecams.json'});
     document.body.appendChild(a);a.click();a.remove();
   });
@@ -332,15 +345,31 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
             have.push(c.url);
           }
         });
-        state.cams=state.cams.length>1?state.cams.filter(function(c){return c.id!=='demo';}):state.cams;
         save();render();
       }catch(e){$('count').textContent='Importeren mislukt. Kies een bestand dat met Exporteer is gemaakt.';}
     };
     r.readAsText(f);this.value='';
   });
 
+  $('reset').addEventListener('click',function(){
+    var b=this;
+    if(b.dataset.sure!=='1'){b.dataset.sure='1';b.textContent='Zeker? Eigen wijzigingen gaan verloren';setTimeout(function(){b.dataset.sure='';b.textContent='Standaard';},4000);return;}
+    b.dataset.sure='';b.textContent='Standaard';
+    state.cams=copyDefaults();state.filter='';save();render();
+  });
+
+  function githubRepo(host,path){
+    var m=/^([a-z0-9-]+)\.github\.io$/i.exec(host);
+    if(!m)return null;
+    var first=(path.split('/')[1]||'');
+    var repo=first&&!/\.html?$/i.test(first)?first:m[1]+'.github.io';
+    return 'https://github.com/'+m[1]+'/'+repo;
+  }
+  var gh=githubRepo(location.hostname,location.pathname);
+  if(gh){$('ghFolder').href=gh;$('ghUpload').href=gh+'/upload/main';$('gh').hidden=false;}
+
   load();render();schedule();
-  window.__pistecams={detect:detect,youtubeId:youtubeId,state:function(){return state;}};
+  window.__pistecams={githubRepo:githubRepo,detect:detect,youtubeId:youtubeId,state:function(){return state;}};
 })();
 </script>
 </body>
