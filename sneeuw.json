@@ -4,7 +4,7 @@
     "Flachau": {
       "berg": null,
       "dal": null,
-      "laatste_update": "18-10-2026 | 18:41",
+      "laatste_update": "19-10-2026 | 12:54",
       "laatste_sneeuwval": "12-10-2026",
       "laatste_24_uur": null,
       "pistes_open": "0 van 120 km",
@@ -15,7 +15,7 @@
     "Mayrhofen": {
       "berg": null,
       "dal": null,
-      "laatste_update": "18-10-2026 | 18:28",
+      "laatste_update": "19-10-2026 | 12:26",
       "laatste_sneeuwval": "14-10-2026",
       "laatste_24_uur": null,
       "pistes_open": "0 van 66 km",
@@ -26,7 +26,7 @@
     "Hintertux": {
       "berg": 10,
       "dal": 0,
-      "laatste_update": "18-10-2026 | 18:00",
+      "laatste_update": "19-10-2026 | 12:11",
       "laatste_sneeuwval": "17-10-2026",
       "laatste_24_uur": null,
       "pistes_open": "21 van 60 km",
@@ -37,7 +37,7 @@
     "Gerlos": {
       "berg": null,
       "dal": null,
-      "laatste_update": "18-10-2026 | 17:56",
+      "laatste_update": "19-10-2026 | 12:08",
       "laatste_sneeuwval": "14-10-2026",
       "laatste_24_uur": null,
       "pistes_open": "0 van 150 km",
@@ -48,7 +48,7 @@
     "Saalbach": {
       "berg": null,
       "dal": null,
-      "laatste_update": "18-10-2026 | 17:55",
+      "laatste_update": "19-10-2026 | 12:38",
       "laatste_sneeuwval": "12-10-2026",
       "laatste_24_uur": null,
       "pistes_open": "0 van 156",
@@ -59,14 +59,25 @@
     "Fiss": {
       "berg": null,
       "dal": null,
-      "laatste_update": "18-10-2026 | 18:37",
+      "laatste_update": "19-10-2026 | 12:48",
       "laatste_sneeuwval": "18-10-2026",
       "laatste_24_uur": null,
       "pistes_open": "0 van 214 km",
       "liften_open": "0 van 38",
       "pistekwaliteit": "gesloten",
       "url": "https://www.sneeuwhoogte.nl/overzicht/oostenrijk/tirol/serfaus-fiss-ladis/fiss"
+    },
+    "Sölden": {
+      "berg": 45,
+      "dal": 0,
+      "laatste_update": "19-10-2026 | 12:31",
+      "laatste_sneeuwval": "17-10-2026",
+      "laatste_24_uur": null,
+      "pistes_open": "24 van 145 km",
+      "liften_open": "8 van 31",
+      "pistekwaliteit": "matig",
+      "url": "https://www.sneeuwhoogte.nl/overzicht/oostenrijk/tirol/s%C3%B6lden-%C3%B6tztal-arena/s%C3%B6lden"
     }
   },
-  "opgehaald": "2026-10-19T09:30+00:00"
+  "opgehaald": "2026-10-19T11:45+00:00"
 }
