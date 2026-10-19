@@ -50,6 +50,11 @@ select,input[type=text],input[type=url],input[type=number]{border:1px solid var(
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,var(--tile)),1fr));gap:14px}
 .tile{background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.snow{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;padding:7px 12px;border-bottom:1px solid var(--line);font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums;text-decoration:none}
+a.snow:hover{background:var(--bg)}
+.snow b{font:700 1.05rem/1 var(--display);color:var(--ink);letter-spacing:.02em}
+.snow .lbl{font:600 .7rem var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--blue)}
+.snow .nodata{font-style:italic}
 .media{position:relative;aspect-ratio:16/9;background:var(--media);color:var(--media-ink);max-width:100%}
 .media img,.media video,.media iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
 .media img,.media video{object-fit:cover}
@@ -112,7 +117,7 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
   <div class="empty" id="empty" hidden>Nog geen webcams. Klik op <strong>+ Webcam</strong> en plak de link van een camera, of op <strong>Standaard</strong> om de vaste webcams terug te zetten.</div>
 
   <footer>
-    De vaste webcams staan in de pagina zelf. Wijzigingen die je maakt worden bewaard in deze browser. Gebruik Exporteer om een back-up te maken of ze naar een ander apparaat mee te nemen.
+    Sneeuwhoogtes komen van <a href="https://www.sneeuwhoogte.nl" target="_blank" rel="noopener">sneeuwhoogte.nl</a> en worden elke drie uur bijgewerkt. Ze verschijnen bij webcams waarvan het skigebied in sneeuw-bronnen.json staat. De vaste webcams staan in de pagina zelf. Wijzigingen die je maakt worden bewaard in deze browser. Gebruik Exporteer om een back-up te maken of ze naar een ander apparaat mee te nemen.
     Sommige webcamsites staan niet toe dat hun pagina in een andere pagina wordt getoond. De tegel blijft dan leeg. Gebruik in dat geval de directe link naar het camerabeeld (.jpg) of open de camera via de knop ↗.
     <div class="gh" id="gh" hidden>
       <a class="btn" id="ghFolder" href="#" target="_blank" rel="noopener">Bestandsmap op GitHub</a>
@@ -259,6 +264,7 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
         btn('✕','Verwijder',function(){remove(c.id,this);})
       ]);
       grid.appendChild(el('article',{className:'tile'},[
+        snowFor(c),
         media,
         el('div',{className:'info'},[
           el('div',{className:'txt'},[el('div',{className:'name',text:c.name}),el('div',{className:'meta',text:meta||' '})]),
@@ -270,6 +276,25 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
     $('count').textContent=state.cams.length+(state.cams.length===1?' webcam':' webcams')+(areas.length?' in '+areas.length+(areas.length===1?' skigebied':' skigebieden'):'');
     document.documentElement.style.setProperty('--tile',state.tile+'px');
     $('size').value=state.tile;$('refresh').value=String(state.refresh);
+  }
+  var snow=null;
+  function snowFor(c){
+    if(!snow||!c.area)return null;
+    var key=c.area.trim().toLowerCase(),d=null,k;
+    for(k in snow){if(k.toLowerCase()===key){d=snow[k];break;}}
+    if(!d)return null;
+    var a=el('a',{className:'snow',href:d.url,target:'_blank',rel:'noopener',title:'Bron: sneeuwhoogte.nl'+(d.laatste_update?' · bijgewerkt '+d.laatste_update:'')});
+    function part(lbl,val){a.appendChild(el('span',{},[el('span',{className:'lbl',text:lbl+' '}),el('b',{text:val})]));}
+    if(d.berg==null&&d.dal==null){a.appendChild(el('span',{className:'nodata',text:'Nog geen sneeuwhoogte gemeld'}));}
+    else{part('Berg',d.berg==null?'.':d.berg+' cm');part('Dal',d.dal==null?'.':d.dal+' cm');}
+    if(d.laatste_sneeuwval)a.appendChild(el('span',{text:'Laatste sneeuw '+d.laatste_sneeuwval.slice(0,5)}));
+    if(d.laatste_24_uur)a.appendChild(el('span',{text:'24 uur: '+d.laatste_24_uur}));
+    return a;
+  }
+  function loadSnow(){
+    if(location.protocol==='file:')return;
+    fetch('sneeuw.json?_='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null;})
+      .then(function(j){if(j&&j.gebieden){snow=j.gebieden;render();}}).catch(function(){});
   }
   function btn(label,title,fn){
     var b=el('button',{type:'button',text:label,title:title});
@@ -368,7 +393,7 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
   var gh=githubRepo(location.hostname,location.pathname);
   if(gh){$('ghFolder').href=gh;$('ghUpload').href=gh+'/upload/main';$('gh').hidden=false;}
 
-  load();render();schedule();
+  load();render();schedule();loadSnow();setInterval(function(){if(!document.hidden)loadSnow();},30*60*1000);
   window.__pistecams={githubRepo:githubRepo,detect:detect,youtubeId:youtubeId,state:function(){return state;}};
 })();
 </script>
