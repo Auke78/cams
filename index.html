@@ -431,26 +431,48 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
   var gh=githubRepo(location.hostname,location.pathname);
   if(gh){$('ghFolder').href=gh;$('ghUpload').href=gh+'/upload/main';$('gh').hidden=false;}
 
-  // Bezoekersteller via GoatCounter (gratis, zonder cookies). Vul hieronder je eigen code in.
-  var GOATCOUNTER='pistecams';
+  // Bezoekersteller via Abacus (gratis, zonder account of cookies).
+  // Per browser telt een bezoeker één keer in totaal, één keer per week en één keer per dag.
+  var TELLER={api:'https://abacus.jasoncameron.dev',ns:'auke78-pistecams',tz:'Europe/Amsterdam'};
+  function datumDelen(d,tz){
+    var p={};
+    try{new Intl.DateTimeFormat('en-CA',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d)
+      .forEach(function(x){p[x.type]=x.value;});}catch(e){}
+    if(!p.year){p={year:String(d.getFullYear()),month:String(d.getMonth()+1).padStart(2,'0'),day:String(d.getDate()).padStart(2,'0')};}
+    return {y:+p.year,m:+p.month,d:+p.day,dag:p.year+'-'+p.month+'-'+p.day};
+  }
+  function isoWeek(y,m,d){
+    var t=new Date(Date.UTC(y,m-1,d)),dn=t.getUTCDay()||7;
+    t.setUTCDate(t.getUTCDate()+4-dn);
+    var jan1=new Date(Date.UTC(t.getUTCFullYear(),0,1));
+    return t.getUTCFullYear()+'-w'+String(Math.ceil(((t-jan1)/864e5+1)/7)).padStart(2,'0');
+  }
+  function tellerSleutels(d){
+    var x=datumDelen(d||new Date(),TELLER.tz);
+    return {totaal:'totaal',week:'week-'+isoWeek(x.y,x.m,x.d),dag:'dag-'+x.dag};
+  }
+  function lees(k){try{return localStorage.getItem('pistecams.teller.'+k);}catch(e){return null;}}
+  function schrijf(k,v){try{localStorage.setItem('pistecams.teller.'+k,v);}catch(e){}}
   function startTeller(){
-    if(!GOATCOUNTER||location.protocol==='file:')return;
-    var base='https://'+GOATCOUNTER+'.goatcounter.com';
-    var sc=document.createElement('script');
-    sc.async=true;sc.src='https://gc.zgo.at/count.js';sc.setAttribute('data-goatcounter',base+'/count');
-    document.head.appendChild(sc);
-    var d=new Date(),dag=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    function haal(q,id){
-      return fetch(base+'/counter/TOTAL.json'+q,{cache:'no-store'}).then(function(r){return r.ok?r.json():Promise.reject();})
-        .then(function(j){$(id).textContent=j.count;return true;});
-    }
-    Promise.all([haal('','vTotal'),haal('?start=week','vWeek'),haal('?start='+dag,'vDay')])
-      .then(function(){$('visits').hidden=false;}).catch(function(){});
+    if(location.protocol==='file:')return;
+    var keys=tellerSleutels(),ids={totaal:'vTotal',week:'vWeek',dag:'vDay'};
+    var verzoeken=Object.keys(keys).map(function(soort){
+      var sleutel=keys[soort],nieuw=lees(soort)!==sleutel;
+      var url=TELLER.api+'/'+(nieuw?'hit':'get')+'/'+TELLER.ns+'/'+sleutel;
+      return fetch(url,{cache:'no-store'}).then(function(r){
+        if(r.status===404)return {value:0};
+        return r.ok?r.json():Promise.reject();
+      }).then(function(j){
+        if(nieuw)schrijf(soort,sleutel);
+        $(ids[soort]).textContent=Number(j.value||0).toLocaleString('nl-NL');
+      });
+    });
+    Promise.all(verzoeken).then(function(){$('visits').hidden=false;}).catch(function(){});
   }
   startTeller();
 
   load();render();schedule();loadSnow();setInterval(function(){if(!document.hidden)loadSnow();},30*60*1000);
-  window.__pistecams={githubRepo:githubRepo,zoekPlaats:zoekPlaats,norm:norm,detect:detect,youtubeId:youtubeId,state:function(){return state;}};
+  window.__pistecams={tellerSleutels:tellerSleutels,githubRepo:githubRepo,zoekPlaats:zoekPlaats,norm:norm,detect:detect,youtubeId:youtubeId,state:function(){return state;}};
 })();
 </script>
 </body>
