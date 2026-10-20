@@ -179,6 +179,13 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
     try{
       var raw=localStorage.getItem(KEY);
       if(raw){var s=JSON.parse(raw);if(s&&Array.isArray(s.cams)){state=Object.assign(state,s);}}
+      // Ontbreekt bij een opgeslagen webcam het skigebied, neem dat dan over van de vaste webcam met dezelfde link.
+      state.cams.forEach(function(c){
+        if(c&&!String(c.area||'').trim()){
+          var d=DEFAULTS.find(function(x){return x.url===c.url;});
+          if(d)c.area=d.area;
+        }
+      });
     }catch(e){}
   }
   function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
