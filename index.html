@@ -50,6 +50,8 @@ select,input[type=text],input[type=url],input[type=number]{border:1px solid var(
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,var(--tile)),1fr));gap:14px}
 .tile{background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.visits{font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums;margin:2px 0 0}
+.visits b{color:var(--ink);font-weight:600}
 .snow{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;padding:7px 12px;border-bottom:1px solid var(--line);font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums;text-decoration:none}
 a.snow:hover{background:var(--bg)}
 .snow b{font:700 1.05rem/1 var(--display);color:var(--ink);letter-spacing:.02em}
@@ -92,6 +94,7 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
       <div>
       <h1>Piste<span>cams</span></h1>
       <p class="sub" id="count"></p>
+      <p class="visits" id="visits" hidden>Bezoekers <b id="vTotal">.</b> · <b id="vWeek">.</b>w · <b id="vDay">.</b>d</p>
       </div>
     </div>
     <div class="bar">
@@ -136,8 +139,8 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
       <label for="fName">Naam
         <input type="text" id="fName" required placeholder="Bergstation Gaislachkogl">
       </label>
-      <label for="fArea">Skigebied
-        <input type="text" id="fArea" list="areas" placeholder="Sölden">
+      <label for="fArea">Skigebied of plaats
+        <input type="text" id="fArea" list="areas" required placeholder="Sölden">
         <datalist id="areas"></datalist>
       </label>
     </div>
@@ -154,7 +157,7 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
         </select>
       </label>
     </div>
-    <p class="hint">Tip: klik op de webcamsite met rechts op het beeld en kies "Afbeeldingsadres kopiëren". Die link werkt het best.</p>
+    <p class="hint">Gebruik bij skigebied de plaatsnaam zoals op sneeuwhoogte.nl, dan komt de sneeuwhoogte er vanzelf bij. Tip: klik op de webcamsite met rechts op het beeld en kies "Afbeeldingsadres kopiëren". Die link werkt het best.</p>
     <div class="end">
       <button type="button" id="cancel">Annuleer</button>
       <button type="submit" class="primary" id="save">Opslaan</button>
@@ -166,7 +169,7 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
 (function(){
   'use strict';
   var KEY='pistecams.v1';
-  var DEFAULTS=[{"id": "d1", "url": "https://webtvfc.feratel.com/webtv/?design=v5&pg=DA7D2F22-8600-464D-9D4F-CDB04014A6C5&cam=5216&lg=de&sound=muted", "name": "Achterjet bergstation", "area": "Flachau", "alt": 1600, "type": "auto"}, {"id": "d2", "url": "https://webtvfc.feratel.com/webtv/?design=v5&pg=DA7D2F22-8600-464D-9D4F-CDB04014A6C5&cam=5635&lg=nl&sound=muted", "name": "Penkenbaan", "area": "Mayrhofen", "alt": 2000, "type": "auto"}, {"id": "d3", "url": "https://webtvfc.feratel.com/webtv/?design=v5&pg=DA7D2F22-8600-464D-9D4F-CDB04014A6C5&cam=5552&lg=nl&sound=muted", "name": "Gefrorene Wand", "area": "Hintertux", "alt": 3250, "type": "auto"}, {"id": "d4", "url": "https://webtvfc.feratel.com/webtv/?design=v5&pg=DA7D2F22-8600-464D-9D4F-CDB04014A6C5&cam=5226&lg=nl&sound=muted", "name": "Isskogel", "area": "Gerlos", "alt": 1900, "type": "auto"}, {"id": "d5", "url": "https://webtvfc.feratel.com/webtv/?cam=5244&design=v5&c0=0&c2=1&c27=1&c45=1&sound=0&lg=nl&pg=DA7D2F22-8600-464D-9D4F-CDB04014A6C5&s=0", "name": "Kohlmaiskopf", "area": "Saalbach", "alt": 1794, "type": "auto"}, {"id": "d6", "url": "https://webtv.feratel.com/webtv/?design=v3&pg=88803C51-0772-44C5-B2C0-8548D51BB270&cam=5542&lg=nl", "name": "Möseralm", "area": "Fiss", "alt": 1812, "type": "auto"}, {"id": "d7", "url": "https://webtvfc.feratel.com/webtv/?design=v5&pg=DA7D2F22-8600-464D-9D4F-CDB04014A6C5&cam=5762&lg=nl&sound=muted", "name": "Giggijoch", "area": "Sölden", "alt": 2275, "type": "auto"}];
+  var DEFAULTS=[{"id": "d1", "url": "https://webtvfc.feratel.com/webtv/?design=v5&pg=DA7D2F22-8600-464D-9D4F-CDB04014A6C5&cam=5216&lg=de&sound=muted", "name": "Achterjet bergstation", "area": "Flachau", "alt": 1600, "type": "auto"}, {"id": "d2", "url": "https://webtvfc.feratel.com/webtv/?design=v5&pg=DA7D2F22-8600-464D-9D4F-CDB04014A6C5&cam=5635&lg=nl&sound=muted", "name": "Penkenbaan", "area": "Mayrhofen", "alt": 2000, "type": "auto"}, {"id": "d3", "url": "https://webtvfc.feratel.com/webtv/?design=v5&pg=DA7D2F22-8600-464D-9D4F-CDB04014A6C5&cam=5552&lg=nl&sound=muted", "name": "Gefrorene Wand", "area": "Hintertux", "alt": 3250, "type": "auto"}, {"id": "d4", "url": "https://webtvfc.feratel.com/webtv/?design=v5&pg=DA7D2F22-8600-464D-9D4F-CDB04014A6C5&cam=5226&lg=nl&sound=muted", "name": "Isskogel", "area": "Gerlos", "alt": 1900, "type": "auto"}, {"id": "d5", "url": "https://webtvfc.feratel.com/webtv/?cam=5244&design=v5&c0=0&c2=1&c27=1&c45=1&sound=0&lg=nl&pg=DA7D2F22-8600-464D-9D4F-CDB04014A6C5&s=0", "name": "Kohlmaiskopf", "area": "Saalbach", "alt": 1794, "type": "auto"}, {"id": "d6", "url": "https://webtv.feratel.com/webtv/?design=v3&pg=88803C51-0772-44C5-B2C0-8548D51BB270&cam=5542&lg=nl", "name": "Möseralm", "area": "Fiss", "alt": 1812, "type": "auto"}, {"id": "d7", "url": "https://webtvfc.feratel.com/webtv/?design=v5&pg=DA7D2F22-8600-464D-9D4F-CDB04014A6C5&cam=5762&lg=nl&sound=muted", "name": "Giggijoch", "area": "Sölden", "alt": 2275, "type": "auto"}, {"id": "d8", "url": "https://webtvfc.feratel.com/webtv/?design=v5&pg=DA7D2F22-8600-464D-9D4F-CDB04014A6C5&cam=5763&lg=nl&sound=muted", "name": "Schwarze Schneid Mittelstation", "area": "Sölden", "alt": 3000, "type": "auto"}];
   function copyDefaults(){return DEFAULTS.map(function(c){return Object.assign({},c);});}
   var state={cams:copyDefaults(),tile:360,refresh:60,filter:''};
   var editId=null,timer=null;
@@ -427,6 +430,24 @@ footer{color:var(--muted);font-size:.82rem;max-width:75ch}
   }
   var gh=githubRepo(location.hostname,location.pathname);
   if(gh){$('ghFolder').href=gh;$('ghUpload').href=gh+'/upload/main';$('gh').hidden=false;}
+
+  // Bezoekersteller via GoatCounter (gratis, zonder cookies). Vul hieronder je eigen code in.
+  var GOATCOUNTER='pistecams';
+  function startTeller(){
+    if(!GOATCOUNTER||location.protocol==='file:')return;
+    var base='https://'+GOATCOUNTER+'.goatcounter.com';
+    var sc=document.createElement('script');
+    sc.async=true;sc.src='https://gc.zgo.at/count.js';sc.setAttribute('data-goatcounter',base+'/count');
+    document.head.appendChild(sc);
+    var d=new Date(),dag=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    function haal(q,id){
+      return fetch(base+'/counter/TOTAL.json'+q,{cache:'no-store'}).then(function(r){return r.ok?r.json():Promise.reject();})
+        .then(function(j){$(id).textContent=j.count;return true;});
+    }
+    Promise.all([haal('','vTotal'),haal('?start=week','vWeek'),haal('?start='+dag,'vDay')])
+      .then(function(){$('visits').hidden=false;}).catch(function(){});
+  }
+  startTeller();
 
   load();render();schedule();loadSnow();setInterval(function(){if(!document.hidden)loadSnow();},30*60*1000);
   window.__pistecams={githubRepo:githubRepo,zoekPlaats:zoekPlaats,norm:norm,detect:detect,youtubeId:youtubeId,state:function(){return state;}};
